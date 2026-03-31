@@ -18,8 +18,16 @@
 using var arquivo = new FileStream("musicas.csv", FileMode.Open, FileAccess.Read);
 using var stream = new StreamReader(arquivo);
 
-var musicas = ObterMusicas(stream);
-ExibirMusicas(musicas);
+
+var musicasDoColdplay = 
+    ObterMusicas(stream)           // 1. obtencao dos dados
+    .FiltrarPor(musica => musica.Titulo.StartsWith('C'))  
+    .FiltrarPor(m => m.Duracao < 350); 
+
+// 1. ObterMusicas(stream)
+// 2. FiltrarPor(musicas, "Metallica")
+// 3. 
+ExibirMusicas(musicasDoColdplay);
 
 void ExibirMusicas(IEnumerable<Musica> musicas)
 {
@@ -27,12 +35,11 @@ void ExibirMusicas(IEnumerable<Musica> musicas)
     var contador = 1;
     foreach (var musica in musicas)
     {
-        Console.WriteLine($"\t - {musica.Titulo}");
+        Console.WriteLine($"\t - {musica.Titulo} ({musica.Artista}) - {musica.Duracao} seg");
         contador++;
         if (contador > 10) break;
     }
 }
-
 IEnumerable<Musica> ObterMusicas(StreamReader stream)
 {
     var linha = stream.ReadLine(); // Pula o cabeçalho
@@ -47,6 +54,24 @@ IEnumerable<Musica> ObterMusicas(StreamReader stream)
         };
         yield return musica;
         linha = stream.ReadLine();
+    }
+}
+
+bool FiltrarPorArtista(Musica musica) => musica.Artista == "Coldplay";
+bool FiltrarMaisLongas(Musica m) => m.Duracao >= 400;
+bool FiltrarPorMetallica(Musica mus) => mus.Artista == "Metallica";
+bool FiltrarPorTituloQueComecaComA(Musica musica) => musica.Titulo.StartsWith('A');
+
+Func<Musica, bool> condicao = FiltrarMaisLongas; // delegate = tipos que representam metodos com a mesma assinatura
+
+static class MusicasExtensions
+{
+    public static IEnumerable<Musica> FiltrarPor(this IEnumerable<Musica> musicas, Func<Musica, bool> condicao)
+    {
+        foreach (var musica in musicas)
+        {
+            if (condicao(musica)) yield return musica;
+        }
     }
 }
 class Musica

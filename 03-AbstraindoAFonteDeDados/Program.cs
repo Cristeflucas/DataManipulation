@@ -21,8 +21,8 @@ using var stream = new StreamReader(arquivo);
 
 var musicasDoColdplay = 
     ObterMusicas(stream)           // 1. obtencao dos dados
-    .FiltrarPor(musica => musica.Titulo.StartsWith('C'))  
-    .FiltrarPor(m => m.Duracao < 350); 
+    .Where(musica => musica.Titulo.StartsWith('C'))  
+    .Where(m => m.Duracao < 350); 
 
 // 1. ObterMusicas(stream)
 // 2. FiltrarPor(musicas, "Metallica")
@@ -66,11 +66,11 @@ Func<Musica, bool> condicao = FiltrarMaisLongas; // delegate = tipos que represe
 
 static class MusicasExtensions
 {
-    public static IEnumerable<Musica> FiltrarPor(this IEnumerable<Musica> musicas, Func<Musica, bool> condicao)
+    public static IEnumerable<T> FiltrarPor<T>(this IEnumerable<T> colecao, Func<T, bool> condicao)
     {
-        foreach (var musica in musicas)
+        foreach (var elemento in colecao)
         {
-            if (condicao(musica)) yield return musica;
+            if (condicao(elemento)) yield return elemento;
         }
     }
 }

@@ -94,7 +94,7 @@ void ExibirMusicasEmTabela(IEnumerable<Musica> musicas)
 
     foreach (var musica in musicas)
     {
-        var linha = $"{musica.Titulo,-40}{musica.Artista,-30}{musica.Duracao/60.0,-10:F2} {musica.Lancamento,-15:dd/MM/yyyy}";
+        var linha = $"{musica.Titulo,-40}{musica.Artista,-30}{musica.Duracao / 60.0,-10:F2} {musica.Lancamento,-15:dd/MM/yyyy}";
         Console.WriteLine(linha);
     }
 }
@@ -106,15 +106,18 @@ IEnumerable<Musica> ObterMusicas(StreamReader stream)
     while (linha is not null)
     {
         var partes = linha.Split(';');
-        var musica = new Musica
+        if (partes.Length == 5)
         {
-            Titulo = partes[0],
-            Artista = partes[1],
-            Duracao = Convert.ToInt32(partes[2]),
-            Generos = partes[3].Split(',', StringSplitOptions.TrimEntries),
-            Lancamento = DateTime.ParseExact(partes[4], "dd/MM/yyyy", CultureInfo.InvariantCulture)
-        };
-        yield return musica;
+            var musica = new Musica
+            {
+                Titulo = string.IsNullOrWhiteSpace(partes[0]) ? "Titulo nao encotrado!" : partes[0],
+                Artista = string.IsNullOrWhiteSpace(partes[1]) ? "Artista nao encotrado!" : partes[1],
+                Duracao = int.TryParse(partes[2], out int duracao) ? duracao : 350,
+                Generos = partes[3].Split(',', StringSplitOptions.TrimEntries),
+                Lancamento = DateTime.ParseExact(partes[4], "dd/MM/yyyy", CultureInfo.InvariantCulture)
+            };
+            yield return musica;
+        }
         linha = stream.ReadLine();
     }
 }

@@ -3,13 +3,38 @@ using System.Globalization;
 using var arquivo = new FileStream("musicas.csv", FileMode.Open, FileAccess.Read);
 using var stream = new StreamReader(arquivo);
 
-var musica = ObterMusicas(stream)
-    .Where(m => m.Artista.Equals("COLDPLAY", StringComparison.OrdinalIgnoreCase))
-    //.Where(m => m.Artista.ToUpper() == "COLDPLAY")
-    .Take(20);
 
-ExibirMusicasEmTabela(musica);
 
+void Interning()
+{
+    var artista1 = "Coldplay"; // interning - string literal
+    var artista2 = "Coldplay";
+    var artista3 = new string("Coldplay"); // não faz interning
+    var artista4 = "COLDPLAY";
+    var artista5 = string.Intern(artista1.ToUpper()); // HEAP x
+
+    Console.WriteLine(artista1 == artista2); // True
+    Console.WriteLine(ReferenceEquals(artista1, artista3)); //True - pool de strings
+    Console.WriteLine(ReferenceEquals(artista1, artista4));
+    Console.WriteLine(ReferenceEquals(artista4, artista5));
+}
+void ComparandoStrings(StreamReader stream)
+{
+    var musicas = ObterMusicas(stream)
+        .Where(musica => musica.Artista.Equals("COLDPLAY", StringComparison.OrdinalIgnoreCase))
+        //.Where(m => m.Artista.ToUpper() == "COLDPLAY")
+        .Take(20);
+
+    // métodos que utilizam StringComparison
+    "Coldplay".Equals("coldplay", StringComparison.OrdinalIgnoreCase);
+    "Coldplay".StartsWith("cold", StringComparison.OrdinalIgnoreCase);
+    "Coldplay".EndsWith("coldplay", StringComparison.OrdinalIgnoreCase);
+    "Coldplay".IndexOf("coldplay", StringComparison.OrdinalIgnoreCase);
+    "Coldplay".Contains("OLD", StringComparison.OrdinalIgnoreCase);
+    "Coldplay".Replace("cold", "warm", StringComparison.OrdinalIgnoreCase);
+
+    ExibirMusicasEmTabela(musicas);
+}
 void AlterandoOTitulo(StreamReader stream)
 {
     var musica = ObterMusicas(stream)

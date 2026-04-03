@@ -4,6 +4,8 @@ using var arquivo = new FileStream("musicas.csv", FileMode.Open, FileAccess.Read
 using var stream = new StreamReader(arquivo);
 
 var musica = ObterMusicas(stream)
+    .Where(m => m.Artista.Equals("COLDPLAY", StringComparison.OrdinalIgnoreCase))
+    //.Where(m => m.Artista.ToUpper() == "COLDPLAY")
     .Take(20);
 
 ExibirMusicasEmTabela(musica);

@@ -10,7 +10,20 @@ var musicas = ObterMusicas(stream)
     .Take(20);
 
 ExibirMusicasEmTabela(musicas);
+void ArtistaComCaracteresEspeciais()
+{
+    var regex = new Regex(@"[^a-zA-Z0-9 ]");
+    var artistas = ObterMusicas(stream)
+        .Where(m => regex.IsMatch(m.Artista))
+        .Select(m => m.Artista)
+        .Distinct()
+        .OrderBy(a => a);
 
+    foreach (var artista in artistas)
+    {
+        Console.WriteLine(artista);
+    }
+}
 void ExibirMusicas(IEnumerable<Musica> musicas)
 {
     var titulo = "\nMúsicas do arquivo:"; // string literal

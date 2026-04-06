@@ -3,13 +3,41 @@ using System.Text.RegularExpressions;
 using var arquivo = new FileStream("musicas.csv", FileMode.Open, FileAccess.Read);
 using var stream = new StreamReader(arquivo);
 
+TitulosComNumeroRomanos();
+void TitulosComNumeroRomanos()
+{
+    var regex = new Regex(@"\b[IVXLCDM]+\b");
+    var musicas = ObterMusicas(stream)
+        .Where(m => regex.IsMatch(m.Titulo))
+        .Take(20);
+    ExibirMusicasEmTabela(musicas);
+}
+void MusicasComLetrasRepetidas()
+{
+    var regex = new Regex(@"\w*(\w)\1{1,}\w");
+    var musicas = ObterMusicas(stream)
+        .Where(m => regex.IsMatch(m.Titulo))
+        .Take(20);
+    ExibirMusicasEmTabela(musicas);
+}
 
+void MusicaQueComecamETerminamComAMesmaPalavra()
+{
+    var regex = new Regex(@"^(\w+).*\1$");
+    var musicas = ObterMusicas(stream)
+        .Where(m => regex.IsMatch(m.Titulo))
+        .Take(20);
+    ExibirMusicasEmTabela(musicas);
+}
+void MusicaComDuasPalavras()
+{
+    var regex = new Regex(@"^\w+ \w+$");
+    var musicas = ObterMusicas(stream)
+        .Where(m => regex.IsMatch(m.Artista))
+        .Take(20);
 
-
-var musicas = ObterMusicas(stream)
-    .Take(20);
-
-ExibirMusicasEmTabela(musicas);
+    ExibirMusicasEmTabela(musicas);
+}
 void ArtistaComCaracteresEspeciais()
 {
     var regex = new Regex(@"[^a-zA-Z0-9 ]");

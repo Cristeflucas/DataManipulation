@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 using var arquivo = new FileStream("musicas.csv", FileMode.Open, FileAccess.Read);
@@ -9,6 +10,20 @@ using var stream = new StreamReader(arquivo);
     2. Gere um arquivo no formato JSON com essa coleção
  
 */
+var options = new JsonSerializerOptions { WriteIndented = true };
+var artista = ObterMusicas(stream)
+    .GroupBy(m => m.Artista)
+    .Select(g => new
+    {
+        Nome = g.Key,
+        Musicas = g.OrderBy(m => m.Lancamento).ToList(),
+        TotalMusicas = g.Count()
+    })
+    .ToList();
+
+var nomeArquivo = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "artistas.json");
+using var arquivoJSON = new FileStream(nomeArquivo, FileMode.Create, FileAccess.Write);
+JsonSerializer.Serialize(arquivoJSON, artista, options);
 
 void ExibirMusicas(IEnumerable<Musica> musicas)
 {
